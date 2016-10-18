@@ -5,14 +5,13 @@
     .module('articles.admin')
     .controller('ArticlesAdminController', ArticlesAdminController);
 
-  ArticlesAdminController.$inject = ['$scope', '$state', '$window', 'articleResolve', 'Authentication'];
+  ArticlesAdminController.$inject = ['$scope', '$state', '$window', 'articleResolve', 'Authentication', 'Notification'];
 
-  function ArticlesAdminController($scope, $state, $window, article, Authentication) {
+  function ArticlesAdminController($scope, $state, $window, article, Authentication, Notification) {
     var vm = this;
 
     vm.article = article;
     vm.authentication = Authentication;
-    vm.error = null;
     vm.form = {};
     vm.remove = remove;
     vm.save = save;
@@ -20,7 +19,10 @@
     // Remove existing Article
     function remove() {
       if ($window.confirm('Are you sure you want to delete?')) {
-        vm.article.$remove($state.go('admin.articles.list'));
+        vm.article.$remove(function() {
+          $state.go('admin.articles.list');
+          Notification.success({ message: '<i class="glyphicon glyphicon-ok"></i> Article deleted successfully!' });
+        });
       }
     }
 
@@ -38,10 +40,11 @@
 
       function successCallback(res) {
         $state.go('admin.articles.list'); // should we send the User to the list or the updated Article's view?
+        Notification.success({ message: '<i class="glyphicon glyphicon-ok"></i> Article saved successfully!' });
       }
 
       function errorCallback(res) {
-        vm.error = res.data.message;
+        Notification.error({ message: res.data.message, title: '<i class="glyphicon glyphicon-remove"></i> Article save error!' });
       }
     }
   }

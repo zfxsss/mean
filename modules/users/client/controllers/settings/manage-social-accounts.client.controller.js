@@ -5,9 +5,9 @@
     .module('users')
     .controller('SocialAccountsController', SocialAccountsController);
 
-  SocialAccountsController.$inject = ['$scope', '$http', 'Authentication'];
+  SocialAccountsController.$inject = ['$scope', 'UsersService', 'Authentication', 'Notification'];
 
-  function SocialAccountsController($scope, $http, Authentication) {
+  function SocialAccountsController($scope, UsersService, Authentication, Notification) {
     var vm = this;
 
     vm.user = Authentication.user;
@@ -27,19 +27,20 @@
 
     // Remove a user social account
     function removeUserSocialAccount(provider) {
-      vm.success = vm.error = null;
 
-      $http.delete('/api/users/accounts', {
-        params: {
-          provider: provider
-        }
-      }).success(function (response) {
-        // If successful show success message and clear form
-        vm.success = true;
-        vm.user = Authentication.user = response;
-      }).error(function (response) {
-        vm.error = response.message;
-      });
+      UsersService.removeSocialAccount(provider)
+        .then(onRemoveSocialAccountSuccess)
+        .catch(onRemoveSocialAccountError);
+    }
+
+    function onRemoveSocialAccountSuccess(response) {
+      // If successful show success message and clear form
+      Notification.success({ message: '<i class="glyphicon glyphicon-ok"></i> Removed successfully!' });
+      vm.user = Authentication.user = response;
+    }
+
+    function onRemoveSocialAccountError(response) {
+      Notification.error({ message: response.message, title: '<i class="glyphicon glyphicon-remove"></i> Remove failed!' });
     }
   }
 }());

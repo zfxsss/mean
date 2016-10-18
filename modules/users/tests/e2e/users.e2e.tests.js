@@ -113,7 +113,7 @@ describe('Users E2E Tests:', function () {
       expect(element.all(by.css('.error-text')).get(0).getText()).toBe('Email address is invalid.');
     });
 
-    it('Should report missing username', function () {
+    it('Should report missing username or email', function () {
       browser.get('http://localhost:3001/authentication/signup');
       // Enter First Name
       element(by.model('vm.credentials.firstName')).sendKeys(user1.firstName);
@@ -272,7 +272,7 @@ describe('Users E2E Tests:', function () {
       // Click Submit button
       element(by.css('button[type=submit]')).click();
       // Password Error
-      expect(element.all(by.css('strong')).get(0).getText()).toBe('Email already exists');
+      expect(element.all(by.css('.message')).get(0).getText()).toBe('Email already exists');
     });
 
     it('Should report Username already exists', function () {
@@ -291,7 +291,7 @@ describe('Users E2E Tests:', function () {
       // Click Submit button
       element(by.css('button[type=submit]')).click();
       // Password Error
-      expect(element.all(by.css('strong')).get(0).getText()).toBe('Username already exists');
+      expect(element.all(by.css('.message')).get(0).getText()).toBe('Username already exists');
     });
 
   });
@@ -306,7 +306,7 @@ describe('Users E2E Tests:', function () {
       // Click Submit button
       element(by.css('button[type="submit"]')).click();
       // Username Error
-      expect(element.all(by.css('.error-text')).get(0).getText()).toBe('Username is required.');
+      expect(element.all(by.css('.error-text')).get(0).getText()).toBe('Username or Email is required.');
       // Password Error
       expect(element.all(by.css('.error-text')).get(1).getText()).toBe('Password is required.');
     });
@@ -317,7 +317,7 @@ describe('Users E2E Tests:', function () {
       // Sign in
       browser.get('http://localhost:3001/authentication/signin');
       // Enter UserName
-      element(by.model('vm.credentials.username')).sendKeys(user1.username);
+      element(by.model('vm.credentials.usernameOrEmail')).sendKeys(user1.username);
       // Enter Password
       element(by.model('vm.credentials.password')).sendKeys(user1.password);
       // Click Submit button
@@ -436,7 +436,7 @@ describe('Users E2E Tests:', function () {
       // Click Submit button
       element(by.css('button[type=submit]')).click();
       // Password Changed
-      expect(element.all(by.css('.text-success')).get(0).getText()).toBe('Password Changed Successfully');
+      expect(element.all(by.css('.ui-notification')).get(0).getText()).toBe('Password Changed Successfully');
     });
   });
 });

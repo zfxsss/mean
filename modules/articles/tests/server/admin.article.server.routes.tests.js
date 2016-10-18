@@ -32,7 +32,7 @@ describe('Article Admin CRUD tests', function () {
   beforeEach(function (done) {
     // Create user credentials
     credentials = {
-      username: 'username',
+      usernameOrEmail: 'username',
       password: 'M3@n.jsI$Aw3$0m3'
     };
 
@@ -43,7 +43,7 @@ describe('Article Admin CRUD tests', function () {
       displayName: 'Full Name',
       email: 'test@test.com',
       roles: ['user', 'admin'],
-      username: credentials.username,
+      username: credentials.usernameOrEmail,
       password: credentials.password,
       provider: 'local'
     });
@@ -170,7 +170,7 @@ describe('Article Admin CRUD tests', function () {
         // Save a new article
         agent.post('/api/articles')
           .send(article)
-          .expect(400)
+          .expect(422)
           .end(function (articleSaveErr, articleSaveRes) {
             // Set message assertion
             (articleSaveRes.body.message).should.match('Title cannot be blank');

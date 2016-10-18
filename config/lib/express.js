@@ -40,6 +40,7 @@ module.exports.initLocalVariables = function (app) {
   app.locals.logo = config.logo;
   app.locals.favicon = config.favicon;
   app.locals.env = process.env.NODE_ENV;
+  app.locals.domain = config.domain;
 
   // Passing the request url to environment locals
   app.use(function (req, res, next) {
@@ -157,7 +158,7 @@ module.exports.initHelmetHeaders = function (app) {
  */
 module.exports.initModulesClientRoutes = function (app) {
   // Setting the app router and static folder
-  app.use('/', express.static(path.resolve('./public')));
+  app.use('/', express.static(path.resolve('./public'), { maxAge: 86400000 }));
 
   // Globbing static routing
   config.folders.client.forEach(function (staticPath) {

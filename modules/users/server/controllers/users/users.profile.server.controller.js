@@ -10,7 +10,8 @@ var _ = require('lodash'),
   mongoose = require('mongoose'),
   multer = require('multer'),
   config = require(path.resolve('./config/config')),
-  User = mongoose.model('User');
+  User = mongoose.model('User'),
+  validator = require('validator');
 
 var whitelistedFields = ['firstName', 'lastName', 'email', 'username'];
 
@@ -30,7 +31,7 @@ exports.update = function (req, res) {
 
     user.save(function (err) {
       if (err) {
-        return res.status(400).send({
+        return res.status(422).send({
           message: errorHandler.getErrorMessage(err)
         });
       } else {
@@ -44,7 +45,7 @@ exports.update = function (req, res) {
       }
     });
   } else {
-    res.status(400).send({
+    res.status(401).send({
       message: 'User is not signed in'
     });
   }
@@ -72,10 +73,10 @@ exports.changeProfilePicture = function (req, res) {
         res.json(user);
       })
       .catch(function (err) {
-        res.status(400).send(err);
+        res.status(422).send(err);
       });
   } else {
-    res.status(400).send({
+    res.status(401).send({
       message: 'User is not signed in'
     });
   }
@@ -128,7 +129,7 @@ exports.changeProfilePicture = function (req, res) {
     return new Promise(function (resolve, reject) {
       req.login(user, function (err) {
         if (err) {
-          reject(err);
+          res.status(400).send(err);
         } else {
           resolve();
         }
@@ -141,5 +142,23 @@ exports.changeProfilePicture = function (req, res) {
  * Send User
  */
 exports.me = function (req, res) {
-  res.json(req.user || null);
+  // Sanitize the user - short term solution. Copied from core.server.controller.js
+  // TODO create proper passport mock: See https://gist.github.com/mweibel/5219403
+  var safeUserObject = null;
+  if (req.user) {
+    safeUserObject = {
+      displayName: validator.escape(req.user.displayName),
+      provider: validator.escape(req.user.provider),
+      username: validator.escape(req.user.username),
+      created: req.user.created.toString(),
+      roles: req.user.roles,
+      profileImageURL: req.user.profileImageURL,
+      email: validator.escape(req.user.email),
+      lastName: validator.escape(req.user.lastName),
+      firstName: validator.escape(req.user.firstName),
+      additionalProvidersData: req.user.additionalProvidersData
+    };
+  }
+
+  res.json(safeUserObject || null);
 };
